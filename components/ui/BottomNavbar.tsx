@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#38A169', // สีเขียวหลัก
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
     //  ไม่ต้องใช้ position: 'absolute', top: -25, หรือ transform
     //  ใช้ margin: 0 แทน flex: 1 เพื่อให้ Home และ Profile โอบล้อม
     marginHorizontal: 15, // เพิ่ม margin เพื่อให้มีระยะห่างจากปุ่มข้างๆ

@@ -13,8 +13,9 @@ import {
 } from 'react-native';
 
 // Import Components ที่เราสร้างไว้
-import CustomDropdown from '../components/ui/dropdown';
+import CustomDropdown from '../components/ui/Dropdown';
 import RoundedInput from '../components/ui/RoundedInput';
+import Button from '../components/ui/Button';
 
 export default function CreatePostScreen() {
   const router = useRouter();
@@ -95,9 +96,17 @@ export default function CreatePostScreen() {
           headerBackTitle: 'กลับ',
           headerRight: () => (
             // ใช้ปุ่มที่เราสร้างเอง แต่ต้องปรับแต่งนิดหน่อย
-            <TouchableOpacity onPress={handlePost} style={styles.postButton}>
-              <Text style={styles.postButtonText}>โพสต์</Text>
-            </TouchableOpacity>
+            <Button
+              title="โพสต์"
+              onPress={handlePost}
+              variant="default"
+              style={{ 
+                marginVertical: 0,
+                marginRight: 10,
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+              }}
+              />
           ),
         }}
       />
@@ -217,19 +226,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white', // พื้นที่ฟอร์มสีขาว
     margin: 16,
     borderRadius: 12,
-  },
-  // Header Button
-  postButton: {
-    backgroundColor: '#28A745', // สีเขียว
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-  postButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   // Image Picker
   imagePicker: {

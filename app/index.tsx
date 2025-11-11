@@ -32,6 +32,9 @@ export default function HomeScreen() {
       <Link href="/createPost" style={styles.testLink}>
         <Text>ไปหน้า createPost</Text>
       </Link>
+      <Link href="/dashboard" style={styles.testLink}>
+        <Text>ไปหน้า dashboard</Text>
+      </Link>
     </View>
   );
 }

@@ -6,12 +6,12 @@ interface RoundedInputProps extends TextInputProps {
   label: string;
 }
 
-const RoundedInput: React.FC<RoundedInputProps> = ({ label, ...props }) => {
+const RoundedInput: React.FC<RoundedInputProps> = ({ label, style, ...props }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, style]}
         placeholderTextColor="#A0AEC0" // สีของ placeholder
         {...props}
       />

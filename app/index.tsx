@@ -29,6 +29,9 @@ export default function HomeScreen() {
       <Link href="/test-components" style={styles.testLink}>
         <Text>ไปหน้า Test Components</Text>
       </Link>
+      <Link href="/createPost" style={styles.testLink}>
+        <Text>ไปหน้า creatPost</Text>
+      </Link>
     </View>
   );
 }

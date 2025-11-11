@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 // 1. Import คอมโพเนนต์ที่เราสร้างเอง
 // (เราถอยหลัง 1 ชั้นจาก `app` เพื่อไปหา `components`)
 import Button from '../components/ui/button';
-import CustomModal from '../components/ui/modal';
 import Customdropdown from '../components/ui/dropdown';
+import CustomModal from '../components/ui/modal';
 
 // 2. Import Dropdown จาก Library
 //import DropDownPicker from 'react-native-dropdown-picker';

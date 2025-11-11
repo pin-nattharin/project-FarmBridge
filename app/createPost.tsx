@@ -1,36 +1,33 @@
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
+import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Platform,
   Alert,
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity
 } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
-import Checkbox from 'expo-checkbox';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 // Import Components ที่เราสร้างไว้
 import CustomDropdown from '../components/ui/dropdown';
-import Button from '../components/ui/button'; // Import ปุ่มของเรา
 import RoundedInput from '../components/ui/RoundedInput';
 
 export default function CreatePostScreen() {
   const router = useRouter();
 
   // --- States for Form Data ---
-  const [image, setImage] = useState<string | null>(null);
-  const [productName, setProductName] = useState<string | null>(null);
-  const [productGrade, setProductGrade] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState('');
-  const [price, setPrice] = useState('');
-  const [date, setDate] = useState(new Date());
-  const [details, setDetails] = useState('');
-  const [allowNegotiation, setAllowNegotiation] = useState(false);
+  const [image_url, setImage_Url] = useState<string | null>(null);
+  const [product_name, setProduct_Name] = useState<string | null>(null);
+  const [grade, setGrade] = useState<string | null>(null);
+  const [quantity_total, setQuantity_Total] = useState('');
+  const [price_per_unit, setPrice_Per_Unit] = useState('');
+  const [pickup_date, setPickup_Date] = useState(new Date());
+  const [description, setDescription] = useState('');
+  //const [allowNegotiation, setAllowNegotiation] = useState(false);
 
   // --- States for UI (Dropdowns, DatePicker) ---
   const [productOpen, setProductOpen] = useState(false);
@@ -45,9 +42,9 @@ export default function CreatePostScreen() {
     { label: 'องุ่น', value: 'grape' },
   ]);
   const [gradeItems, setGradeItems] = useState([
-    { label: 'เกรด A (ส่งออก)', value: 'A' },
-    { label: 'เกรด B (ตลาด)', value: 'B' },
-    { label: 'เกรด C (ตกเกรด)', value: 'C' },
+    { label: 'เกรด B (มีตำหนิบนผิวได้เล็กน้อย (เช่น จุดกระ ))', value: 'B' },
+    { label: 'เกรด C (มีตำหนิบนผิว และขนาดเล็ก)', value: 'C' },
+    { label: 'ต่ำกว่าเกรด C (มีตำหนิมาก เช่น มีรอยแผลเป็น)', value: 'C-' },
   ]);
 
   // --- Function: เลือกรูปภาพ ---
@@ -60,29 +57,29 @@ export default function CreatePostScreen() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImage_Url(result.assets[0].uri);
     }
   };
 
   // --- Function: เลือกวันที่ ---
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-    const currentDate = selectedDate || date;
+    const currentDate = selectedDate || pickup_date;
     setShowDatePicker(Platform.OS === 'ios'); // บน iOS ปิดทันที
-    setDate(currentDate);
+    setPickup_Date(currentDate);
   };
 
   // --- Function: กดโพสต์ ---
   const handlePost = () => {
     // รวบรวมข้อมูลทั้งหมด
     const postData = {
-      image,
-      productName,
-      productGrade,
-      quantity,
-      price,
-      pickupDate: date.toISOString(),
-      details,
-      allowNegotiation,
+      image_url,
+      product_name,
+      grade,
+      quantity_total,
+      price_per_unit,
+      pickupDate: pickup_date.toISOString(),
+      description,
+      //allowNegotiation,
     };
     console.log('Post Data:', postData);
     Alert.alert('โพสต์สำเร็จ!', 'ข้อมูลประกาศของคุณถูกบันทึกแล้ว');
@@ -109,8 +106,8 @@ export default function CreatePostScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         {/* --- เลือกรูปภาพ --- */}
         <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-          {image ? (
-            <Image source={{ uri: image }} style={styles.image} />
+          {image_url ? (
+            <Image source={{ uri: image_url }} style={styles.image} />
           ) : (
             <Text style={styles.imagePickerText}>+ เพิ่มรูปภาพสินค้า</Text>
           )}
@@ -120,10 +117,10 @@ export default function CreatePostScreen() {
         <Text style={styles.label}>ชื่อสินค้า</Text>
         <CustomDropdown
           open={productOpen}
-          value={productName}
+          value={product_name}
           items={productItems}
           setOpen={setProductOpen}
-          setValue={setProductName}
+          setValue={setProduct_Name}
           setItems={setProductItems}
           placeholder="เลือกชื่อสินค้า"
           containerStyle={{ zIndex: 1000, marginVertical: 8 }}
@@ -135,10 +132,10 @@ export default function CreatePostScreen() {
         <Text style={styles.label}>เกรดสินค้า</Text>
         <CustomDropdown
           open={gradeOpen}
-          value={productGrade}
+          value={grade}
           items={gradeItems}
           setOpen={setGradeOpen}
-          setValue={setProductGrade}
+          setValue={setGrade}
           setItems={setGradeItems}
           placeholder="เลือกเกรดสินค้า"
           containerStyle={{ zIndex: 900, marginVertical: 8 }}
@@ -149,8 +146,8 @@ export default function CreatePostScreen() {
         <RoundedInput
           label="จำนวน (กิโลกรัม)"
           placeholder="ระบุจำนวน"
-          value={quantity}
-          onChangeText={setQuantity}
+          value={quantity_total}
+          onChangeText={setQuantity_Total}
           keyboardType="numeric"
         />
 
@@ -158,8 +155,8 @@ export default function CreatePostScreen() {
         <RoundedInput
         label="ราคา/กิโลกรัม (บาท)"
           placeholder="ระบุราคา"
-          value={price}
-          onChangeText={setPrice}
+          value={price_per_unit}
+          onChangeText={setPrice_Per_Unit}
           keyboardType="numeric"
         />
 
@@ -167,14 +164,14 @@ export default function CreatePostScreen() {
         <Text style={styles.label}>วันที่สะดวกให้ผู้ซื้อมารับ</Text>
         <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
           <Text style={styles.datePickerText}>
-            {date.toLocaleDateString('th-TH')}
+            {pickup_date.toLocaleDateString('th-TH')}
           </Text>
         </TouchableOpacity>
         
         {showDatePicker && (
           <DateTimePicker
             testID="dateTimePicker"
-            value={date}
+            value={pickup_date}
             mode="date"
             is24Hour={true}
             display="default"
@@ -186,15 +183,15 @@ export default function CreatePostScreen() {
         <RoundedInput
           label="รายละเอียดเพิ่มเติม"
           placeholder="เช่น สถานที่รับ, เวลา..."
-          value={details}
-          onChangeText={setDetails}
+          value={description}
+          onChangeText={setDescription}
           multiline={true}
           numberOfLines={4}
           style={{ height: 100, textAlignVertical: 'top', paddingTop: 16 }}
         />
 
         {/* --- Checkbox ต่อรองราคา --- */}
-        <View style={styles.checkboxContainer}>
+        {/* <View style={styles.checkboxContainer}>
           <Checkbox
             style={styles.checkbox}
             value={allowNegotiation}
@@ -202,7 +199,7 @@ export default function CreatePostScreen() {
             color={allowNegotiation ? '#28A745' : undefined}
           />
           <Text style={styles.checkboxLabel}>เปิดต่อรองราคา</Text>
-        </View>
+        </View> */}
 
       </ScrollView>
     </>

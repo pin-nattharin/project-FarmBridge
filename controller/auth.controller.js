@@ -9,7 +9,7 @@ const { sign } = require('../utils/jwt');
 // register
 exports.register = async (req, res) => {
   try {
-    const { fullname, email, password, role, phone, address, profile_image_base64, farmer_doc_url } = req.body;
+    const { fullname, email, password, role, phone, address, farmer_doc_url } = req.body;
 
     if (!fullname || !email || !password || !role) {
       return res.status(400).json({ message: 'fullname, email, password and role are required' });
@@ -29,7 +29,6 @@ exports.register = async (req, res) => {
         password_hash,
         phone,
         address,
-        profile_image_base64: profile_image_base64 || null,
         farmer_doc_url: farmer_doc_url || null
       });
 
@@ -45,7 +44,6 @@ exports.register = async (req, res) => {
         password_hash,
         phone,
         address,
-        profile_image_base64: profile_image_base64 || null
       });
 
       const token = sign({ id: buyer.id, role: 'buyer' });

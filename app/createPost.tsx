@@ -1,7 +1,7 @@
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
@@ -13,9 +13,32 @@ import {
 } from 'react-native';
 
 // Import Components ที่เราสร้างไว้
+import Button from '../components/ui/Button';
 import CustomDropdown from '../components/ui/Dropdown';
 import RoundedInput from '../components/ui/RoundedInput';
-import Button from '../components/ui/Button';
+
+const allGradesData = {
+  durian: [
+    { label: 'เกรด B (ทรงปกติ เปลือกไม่ช้ำมาก)', value: 'B' },
+    { label: 'เกรด C (รูปทรงปกติ มีรอยช้ำเล็กน้อย)', value: 'C' },
+    { label: 'ต่ำกว่าเกรด C (บิดเบี้ยว หนามหัก เปลือกช้ำ)', value: 'C-' },
+  ],
+  mango: [
+    { label: 'เกรด B (รูปร่างสวย ไม่มีช้ำมาก)', value: 'B' },
+    { label: 'เกรด C (มีรอยช้ำเล็กน้อย)', value: 'C' },
+    { label: 'ต่ำกว่าเกรด C (ช้ำ บิดเบี้ยว)', value: 'C-' },
+  ],
+  mangosteen: [
+    { label: 'เกรด B (เปลือกเรียบ ช้ำเล็กน้อย)', value: 'B' },
+    { label: 'เกรด C (มีรอยช้ำเล็กน้อย)', value: 'C' },
+    { label: 'ต่ำกว่าเกรด C (ช้ำ บิดเบี้ยว)', value: 'C-' },
+  ],
+  grape: [
+    { label: 'เกรด B (ผิวเรียบ มีรอยช้ำเล็กน้อย)', value: 'B' },
+    { label: 'เกรด C (มีรอยช้ำเล็กน้อย)', value: 'C' },
+    { label: 'ต่ำกว่าเกรด C (ช้ำ บิดเบี้ยว)', value: 'C-' },
+  ],
+};
 
 export default function CreatePostScreen() {
   const router = useRouter();
@@ -31,8 +54,7 @@ export default function CreatePostScreen() {
   //const [allowNegotiation, setAllowNegotiation] = useState(false);
 
   // --- States for UI (Dropdowns, DatePicker) ---
-  const [productOpen, setProductOpen] = useState(false);
-  const [gradeOpen, setGradeOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   // --- Dropdown Items (ตัวอย่าง) ---
@@ -42,11 +64,20 @@ export default function CreatePostScreen() {
     { label: 'มังคุด', value: 'mangosteen' },
     { label: 'องุ่น', value: 'grape' },
   ]);
-  const [gradeItems, setGradeItems] = useState([
-    { label: 'เกรด B (มีตำหนิบนผิวได้เล็กน้อย (เช่น จุดกระ ))', value: 'B' },
-    { label: 'เกรด C (มีตำหนิบนผิว และขนาดเล็ก)', value: 'C' },
-    { label: 'ต่ำกว่าเกรด C (มีตำหนิมาก เช่น มีรอยแผลเป็น)', value: 'C-' },
-  ]);
+  const [gradeItems, setGradeItems] = useState<Array<{label: string, value: string}>>([]);
+
+
+  useEffect(() => {
+    if (product_name) {
+      const newGrades = allGradesData[product_name as keyof typeof allGradesData] || [];
+      setGradeItems(newGrades);
+    } else {
+      setGradeItems([]);
+    }
+
+    setGrade(null); 
+
+  }, [product_name]);
 
   // --- Function: เลือกรูปภาพ ---
   const pickImage = async () => {
@@ -87,15 +118,28 @@ export default function CreatePostScreen() {
     router.back(); // กลับไปหน้าก่อนหน้า
   };
 
+/*   const handleOpenProductDropdown = React.useCallback(
+  (isOpen: boolean) => {
+    setOpenDropdown(isOpen ? 'product' : null);
+  },
+  []
+);
+
+  const handleOpenGradeDropdown = React.useCallback(
+  (isOpen: boolean) => {
+    setOpenDropdown(isOpen ? 'grade' : null);
+  },
+  []
+); */
+
   return (
     <>
       {/* 1. ส่วน Header (จัดการโดย Expo Router) */}
       <Stack.Screen
         options={{
-          title: 'ฟีเจอร์ประกาศขาย 3',
+          title: 'ฟีเจอร์ประกาศขาย',
           headerBackTitle: 'กลับ',
           headerRight: () => (
-            // ใช้ปุ่มที่เราสร้างเอง แต่ต้องปรับแต่งนิดหน่อย
             <Button
               title="โพสต์"
               onPress={handlePost}
@@ -125,30 +169,30 @@ export default function CreatePostScreen() {
         {/* --- ชื่อสินค้า (Dropdown) --- */}
         <Text style={styles.label}>ชื่อสินค้า</Text>
         <CustomDropdown
-          open={productOpen}
+          open={openDropdown === 'product'}
+          setOpen={(isOpen) => setOpenDropdown(isOpen ? 'product' : null)}
           value={product_name}
           items={productItems}
-          setOpen={setProductOpen}
           setValue={setProduct_Name}
           setItems={setProductItems}
           placeholder="เลือกชื่อสินค้า"
-          containerStyle={{ zIndex: 1000, marginVertical: 8 }}
-          // ปิดไม่ให้ Dropdown หลายอันเปิดพร้อมกัน
-          onOpen={() => setGradeOpen(false)} 
+          containerStyle={{ zIndex: 1000, marginVertical: 8 }} 
         />
 
         {/* --- เกรดสินค้า (Dropdown) --- */}
         <Text style={styles.label}>เกรดสินค้า</Text>
         <CustomDropdown
-          open={gradeOpen}
-          value={grade}
+          open={openDropdown === 'grade'}
+          setOpen={(isOpen) => setOpenDropdown(isOpen ? 'grade' : null)}
+          value={grade} 
           items={gradeItems}
-          setOpen={setGradeOpen}
           setValue={setGrade}
           setItems={setGradeItems}
           placeholder="เลือกเกรดสินค้า"
           containerStyle={{ zIndex: 900, marginVertical: 8 }}
-          onOpen={() => setProductOpen(false)}
+         // ⬇️ 8. (สำคัญ) ปิดการใช้งาน Dropdown นี้ ถ้ายังไม่เลือกสินค้า
+          disabled={!product_name} 
+          disabledStyle={{ backgroundColor: '#F0F0F0' }}
         />
 
         {/* --- จำนวน --- */}

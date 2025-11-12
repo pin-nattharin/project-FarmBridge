@@ -35,6 +35,9 @@ export default function HomeScreen() {
       <Link href="/historySale" style={styles.testLink}>
         <Text>ไปหน้า historySale</Text>
       </Link>
+      <Link href="/dashboard" style={styles.testLink}>
+        <Text>ไปหน้า dashboard</Text>
+      </Link>
     </View>
   );
 }

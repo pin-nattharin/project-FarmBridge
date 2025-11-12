@@ -3,6 +3,10 @@
 # dependencies
 node_modules/
 
+# prevent uploading package files
+package.json
+package-lock.json
+
 # Expo
 .expo/
 dist/

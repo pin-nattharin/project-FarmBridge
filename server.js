@@ -10,9 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/listings', require('./routes/listing.routes'));
-
-// Health check
-app.get('/health', (req, res) => res.json({ ok: true }));
+app.use('/api/demands', require('./routes/demand.routes'));
 
 const PORT = 3000;
 

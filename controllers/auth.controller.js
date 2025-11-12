@@ -1,5 +1,3 @@
-// controller/auth.controller.js
-// controllers/auth.controller.js
 const db = require('../models');
 const Farmers = db.Farmers;
 const Buyers = db.Buyers;
@@ -19,7 +17,6 @@ exports.register = async (req, res) => {
     const password_hash = await hash(password);
 
     if (role === 'farmer') {
-      // check exists
       const ex = await Farmers.findOne({ where: { email: lowerEmail } });
       if (ex) return res.status(400).json({ message: 'Email already exists (farmer)' });
 
@@ -34,6 +31,7 @@ exports.register = async (req, res) => {
 
       const token = sign({ id: farmer.id, role: 'farmer' });
       return res.status(201).json({ message: 'Farmer registered', token, user: { id: farmer.id, fullname: farmer.fullname, email: farmer.email, role: 'farmer' } });
+
     } else if (role === 'buyer') {
       const ex = await Buyers.findOne({ where: { email: lowerEmail } });
       if (ex) return res.status(400).json({ message: 'Email already exists (buyer)' });
@@ -43,7 +41,7 @@ exports.register = async (req, res) => {
         email: lowerEmail,
         password_hash,
         phone,
-        address,
+        address
       });
 
       const token = sign({ id: buyer.id, role: 'buyer' });
@@ -53,9 +51,6 @@ exports.register = async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    if (err.name && (err.name === 'SequelizeUniqueConstraintError' || err.name === 'SequelizeValidationError')) {
-      return res.status(400).json({ message: 'Validation error', errors: err.errors.map(e => ({ field: e.path, message: e.message })) });
-    }
     res.status(500).json({ message: 'Register failed', error: err.message });
   }
 };
@@ -67,16 +62,12 @@ exports.login = async (req, res) => {
     if (!email || !password) return res.status(400).json({ message: 'email and password required' });
 
     const lowerEmail = email.toLowerCase();
-
     let user = null;
     let userRole = role;
 
-    // If role passed, search that table; else try farmer then buyer
-    if (userRole === 'farmer') {
-      user = await Farmers.findOne({ where: { email: lowerEmail } });
-    } else if (userRole === 'buyer') {
-      user = await Buyers.findOne({ where: { email: lowerEmail } });
-    } else {
+    if (userRole === 'farmer') user = await Farmers.findOne({ where: { email: lowerEmail } });
+    else if (userRole === 'buyer') user = await Buyers.findOne({ where: { email: lowerEmail } });
+    else {
       user = await Farmers.findOne({ where: { email: lowerEmail } });
       userRole = 'farmer';
       if (!user) {

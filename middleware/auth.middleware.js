@@ -1,6 +1,7 @@
-// middleware/auth.middleware.js
 const { verify } = require('../utils/jwt');
 const db = require('../models');
+const Farmers = db.Farmers;
+const Buyers = db.Buyers;
 
 module.exports.authenticateToken = async (req, res, next) => {
   try {
@@ -8,15 +9,13 @@ module.exports.authenticateToken = async (req, res, next) => {
     const token = header && header.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'No token provided' });
 
-    const payload = verify(token); // throws if invalid
-    // payload: { id, role, iat, exp }
+    const payload = verify(token);
     req.identity = { id: payload.id, role: payload.role };
 
-    // Attach model instance (full record) to req.identity.model if needed
     if (payload.role === 'farmer') {
-      req.identity.model = await db.Farmers.findByPk(payload.id);
+      req.identity.model = await Farmers.findByPk(payload.id);
     } else if (payload.role === 'buyer') {
-      req.identity.model = await db.Buyers.findByPk(payload.id);
+      req.identity.model = await Buyers.findByPk(payload.id);
     } else {
       req.identity.model = null;
     }

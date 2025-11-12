@@ -1,13 +1,12 @@
-// controllers/listing.controller.js
 const db = require('../models');
 const Listings = db.Listings;
 const Farmers = db.Farmers;
 
-// GET /api/listings
+// GET all listings
 exports.getAll = async (req, res) => {
   try {
     const rows = await Listings.findAll({
-      include: [{ model: Farmers, as: 'seller', attributes: ['id', 'fullname', 'email', 'phone', 'profile_image_base64'] }]
+      include: [{ model: Farmers, as: 'seller', attributes: ['id','fullname','email','phone'] }]
     });
     res.json(rows);
   } catch (err) {
@@ -16,12 +15,12 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// GET /api/listings/:id
+// GET listing by id
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
     const listing = await Listings.findByPk(id, {
-      include: [{ model: Farmers, as: 'seller', attributes: ['id', 'fullname', 'email', 'phone'] }]
+      include: [{ model: Farmers, as: 'seller', attributes: ['id','fullname','email','phone'] }]
     });
     if (!listing) return res.status(404).json({ message: 'Listing not found' });
     res.json(listing);
@@ -30,14 +29,18 @@ exports.getById = async (req, res) => {
   }
 };
 
-// POST /api/listings  (farmer only)
+// CREATE listing
 exports.create = async (req, res) => {
   try {
-    const identity = req.identity; // from auth middleware
+    const identity = req.identity;
     if (!identity || identity.role !== 'farmer') return res.status(403).json({ message: 'Only farmers can create listings' });
 
     const payload = req.body;
-    // ensure seller_id = identity.id
+
+    if (payload.location_geom) {
+      payload.location_geom = { type: 'Point', coordinates: [payload.location_geom.lng, payload.location_geom.lat] };
+    }
+
     const newListing = await Listings.create({
       seller_id: identity.id,
       product_name: payload.product_name,
@@ -53,7 +56,7 @@ exports.create = async (req, res) => {
       pickup_date: payload.pickup_date || null,
       pickup_time: payload.pickup_time || null,
       status: payload.status || 'available',
-      location_geom: payload.location_geom ? { type: 'Point', coordinates: [payload.location_geom.lng, payload.location_geom.lat] } : null
+      location_geom: payload.location_geom || null
     });
 
     res.status(201).json({ message: 'Listing created', listing: newListing });
@@ -63,7 +66,7 @@ exports.create = async (req, res) => {
   }
 };
 
-// PUT /api/listings/:id
+// UPDATE listing
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
@@ -88,7 +91,7 @@ exports.update = async (req, res) => {
   }
 };
 
-// DELETE /api/listings/:id
+// DELETE listing
 exports.remove = async (req, res) => {
   try {
     const { id } = req.params;

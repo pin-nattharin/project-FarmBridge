@@ -8,9 +8,12 @@ import {
   SafeAreaView,
 } from 'react-native';
 
-// (ไม่ต้อง import CustomDropdown แล้ว)
+import { useRouter } from 'expo-router'; // <-- 1. Import useRouter
+import NavbarFarmer from '../../components/ui/NavbarFarmer';
 
 const DashboardScreen = () => {
+  const router = useRouter();
+
   // --- 1. State สำหรับ Dropdown ---
   const [selectedChart, setSelectedChart] = useState('มะม่วง'); // ค่าเริ่มต้น
   const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -22,6 +25,22 @@ const DashboardScreen = () => {
   const handleSelectOption = (option: string) => {
     setSelectedChart(option); // 1. อัปเดตค่าที่เลือก
     setDropdownVisible(false); // 2. ปิดเมนู
+  };
+
+  // --- 2. เพิ่มฟังก์ชันสำหรับ Navbar ---
+  const handleNavHome = () => {
+    // ไม่ต้องทำอะไร เพราะอยู่ที่นี่แล้ว
+  };
+  const handleNavChart = () => {
+  };
+  const handleNavAdd = () => {
+    router.push('/farmer/createPost'); // (แก้ Path ให้ถูก)
+  };
+  const handleNavNotifications = () => {
+    //router.push('/notifications'); // (แก้ Path ให้ถูก)
+  };
+  const handleNavProfile = () => {
+    router.push('/farmer/farmerProfile'); // (แก้ Path ให้ถูก)
   };
 
   return (
@@ -109,6 +128,16 @@ const DashboardScreen = () => {
           </View>
         </View>
       </ScrollView>
+      {/* --- 3. เพิ่ม Navbar ที่นี่ --- */}
+      {/* (อยู่นอก ScrollView แต่ใน SafeAreaView) */}
+      <NavbarFarmer
+        activeTab="chart" // (บอก Navbar ว่าปุ่ม Home active อยู่)
+        onHomePress={handleNavHome}
+        onChartPress={handleNavChart}
+        onAddPress={handleNavAdd}
+        onNotificationsPress={handleNavNotifications}
+        onProfilePress={handleNavProfile}
+      />
     </SafeAreaView>
   );
 };

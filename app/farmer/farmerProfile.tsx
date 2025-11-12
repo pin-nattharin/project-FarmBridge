@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { useRouter } from 'expo-router';
+import FarmerNavbar from '../../components/ui/FarmerNavbar';
 
 // --- (จำลอง) ข้อมูลที่ดึงมาจาก API/Database ---
 // โดยอ้างอิงจาก Schema 'farmers'
@@ -58,6 +59,24 @@ const FarmerProfileScreen = () => {
     // ไปยังหน้า "ประวัติการโพสต์ขาย" (ตามที่คุณบอกคือ app/historySale.tsx)
     router.push('../historySale');
   };
+
+  // --- 2. เพิ่มฟังก์ชันสำหรับ Navbar ---
+  const handleNavHome = () => {
+    router.push('/'); // (สมมติว่า Home คือ '/')
+  };
+  const handleNavAdd = () => {
+    router.push('/farmer/createPost'); // (สมมติว่าปุ่ม Add ไปหน้านี้)
+  };
+  const handleNavProfile = () => {
+    // ไม่ต้องทำอะไร เพราะอยู่ที่นี่แล้ว
+  };
+  const handleNavChart = () => {
+    router.push('/farmer/dashboard'); // (สมมติว่า Path คือ /chart)
+  };
+  const handleNavNotifications = () => {
+    //router.push('/notifications'); // (สมมติว่า Path คือ /notifications)
+  };
+
   // สร้างชื่อย่อจาก fullname
   const initials = getInitials(farmerData.fullname);
 
@@ -114,6 +133,16 @@ const FarmerProfileScreen = () => {
           </View>
         </View>
       </ScrollView>
+      {/* --- 3. เพิ่ม Navbar ที่นี่ --- */}
+      {/* (อยู่นอก ScrollView แต่ใน SafeAreaView) */}
+      <FarmerNavbar
+        activeTab="profile" // (บอก Navbar ว่าปุ่ม Profile active อยู่)
+        onHomePress={handleNavHome}
+        onChartPress={handleNavChart}
+        onAddPress={handleNavAdd}
+        onNotificationsPress={handleNavNotifications}
+        onProfilePress={handleNavProfile}
+      />
     </SafeAreaView>
   );
 };

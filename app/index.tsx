@@ -38,6 +38,9 @@ export default function HomeScreen() {
       <Link href="/dashboard" style={styles.testLink}>
         <Text>ไปหน้า dashboard</Text>
       </Link>
+      <Link href="/farmerProfile" style={styles.testLink}>
+        <Text>ไปหน้า farmerProfile</Text>
+      </Link>
     </View>
   );
 }

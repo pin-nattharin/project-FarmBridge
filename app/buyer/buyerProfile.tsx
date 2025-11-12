@@ -58,10 +58,6 @@ const FarmerProfileScreen = () => {
         router.push('/editProfile');
     };
 
-    const handleHistorySale = () => {
-        //router.push('/');
-    };
-
     const handleLogout = () => {
         Alert.alert(
             "ออกจากระบบ",
@@ -85,13 +81,15 @@ const FarmerProfileScreen = () => {
         setActiveTab(tab);
         // กำหนดเส้นทางนำทางหลักที่นี่
         if (tab === 'home') {
-            //router.replace('/home'); // ไปหน้าแรก
+            router.replace('/buyer/homeBuyer'); // ไปหน้าแรก
         } else if (tab === 'add') {
             router.push('/buyer/createDemand'); // ไปหน้าสร้างโพสต์
+        } else if (tab === 'list') {
+            router.replace('/buyer/historyDemand'); // ไปหน้าประวัติการขอซื้อ
+        } else if (tab === 'notify') {
+            router.replace('/buyer/notificationDemand'); // ไปหน้าการแจ้งเตือน
         } else if (tab === 'profile') {
-            router.replace('./buyerProfile'); // อยู่หน้าเดิม (แต่ทำ replace เพื่อให้แน่ใจ)
-        } else {
-            Alert.alert("นำทาง", `ไปที่หน้า ${tab.toUpperCase()}`);
+            //router.replace('./buyerProfile'); // อยู่หน้าเดิม (แต่ทำ replace เพื่อให้แน่ใจ)
         }
     };
     // ------------------------------------

@@ -6,8 +6,8 @@ import * as DocumentPicker from 'expo-document-picker';
 import { useRouter } from 'expo-router'; 
 
 // *** ตรวจสอบ Path การ Import ให้ถูกต้อง ***
-import RoundedInput from '../components/ui/RoundedInput'; 
-import Button from '../components/ui/Button'; 
+import RoundedInput from '../../components/ui/RoundedInput'; 
+import Button from '../../components/ui/Button'; 
 
 // สร้างตัวแปร styles ที่สามารถ export เพื่อให้ LoginScreen ใช้งานได้
 export const registerBaseStyles = StyleSheet.create({
@@ -105,7 +105,7 @@ const RegisterSellerScreen: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null); // State สำหรับเก็บไฟล์ที่เลือก
   
   const handleRegister = () => {
-    router.push('/loginScreen');
+    router.push('/LoginScreen');
   };
 
   // ฟังก์ชันใหม่สำหรับเลือกเอกสาร/รูปภาพ

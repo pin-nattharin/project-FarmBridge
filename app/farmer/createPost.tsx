@@ -13,9 +13,9 @@ import {
 } from 'react-native';
 
 // Import Components ที่เราสร้างไว้
-import Button from '../components/ui/Button';
-import CustomDropdown from '../components/ui/Dropdown';
-import RoundedInput from '../components/ui/RoundedInput';
+import Button from '../../components/ui/Button';
+import CustomDropdown from '../../components/ui/Dropdown';
+import RoundedInput from '../../components/ui/RoundedInput';
 
 const allGradesData = {
   durian: [

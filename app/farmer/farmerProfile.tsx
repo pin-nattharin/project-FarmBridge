@@ -56,7 +56,7 @@ const FarmerProfileScreen = () => {
 
   const handleHistorySale = () => {
     // ไปยังหน้า "ประวัติการโพสต์ขาย" (ตามที่คุณบอกคือ app/historySale.tsx)
-    router.push('/historySale');
+    router.push('../historySale');
   };
   // สร้างชื่อย่อจาก fullname
   const initials = getInitials(farmerData.fullname);

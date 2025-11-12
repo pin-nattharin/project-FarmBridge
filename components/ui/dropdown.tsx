@@ -22,6 +22,8 @@ const CustomDropdown = (props: CustomDropdownProps) => {
     <View style={[styles.wrapper, props.containerStyle]}> 
       <DropDownPicker
         {...props} // ส่ง props ทั้งหมดที่รับเข้ามา (เช่น open, value, items, setOpen, setValue, setItems)
+
+        listMode="SCROLLVIEW" // ใช้ ScrollView สำหรับรายการยาวๆ
         
         // --- นี่คือส่วนของการปรับแต่ง Style ที่เราห่อหุ้มไว้ ---
         style={[styles.dropdownButton, props.style]} // Style ของปุ่มหลัก

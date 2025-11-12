@@ -2,7 +2,8 @@ import React, { useState } from 'react'; // 🟢 เพิ่ม useState
 import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
-import * as DocumentPicker from 'expo-document-picker'; // 🟢 Import DocumentPicker
+import * as DocumentPicker from 'expo-document-picker'; 
+import { useRouter } from 'expo-router'; 
 
 // *** ตรวจสอบ Path การ Import ให้ถูกต้อง ***
 import RoundedInput from '../components/ui/RoundedInput'; 
@@ -100,11 +101,11 @@ export const registerBaseStyles = StyleSheet.create({
 });
 
 const RegisterSellerScreen: React.FC = () => {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null); // State สำหรับเก็บไฟล์ที่เลือก
   
   const handleRegister = () => {
-    console.log('Register pressed');
-    // ในขั้นตอนนี้ คุณจะส่งข้อมูลการลงทะเบียนและ 'selectedFile' ไปยังเซิร์ฟเวอร์
+    router.push('/loginScreen');
   };
 
   // ฟังก์ชันใหม่สำหรับเลือกเอกสาร/รูปภาพ

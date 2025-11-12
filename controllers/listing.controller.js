@@ -1,6 +1,7 @@
 const db = require('../models');
 const Listings = db.Listings;
 const Farmers = db.Farmers;
+const { geocodeAddress } = require('../utils/geocode');
 
 // GET all listings
 exports.getAll = async (req, res) => {
@@ -29,7 +30,7 @@ exports.getById = async (req, res) => {
   }
 };
 
-// CREATE listing
+// CREATE listing (เฉพาะเกษตรกร)
 exports.create = async (req, res) => {
   try {
     const identity = req.identity;
@@ -37,8 +38,10 @@ exports.create = async (req, res) => {
 
     const payload = req.body;
 
-    if (payload.location_geom) {
-      payload.location_geom = { type: 'Point', coordinates: [payload.location_geom.lng, payload.location_geom.lat] };
+    // ถ้ามี address ให้แปลงเป็นพิกัด
+    if (payload.address) {
+      const coords = await geocodeAddress(payload.address);
+      if (coords) payload.location_geom = { type: 'Point', coordinates: [coords.lng, coords.lat] };
     }
 
     const newListing = await Listings.create({
@@ -66,7 +69,7 @@ exports.create = async (req, res) => {
   }
 };
 
-// UPDATE listing
+// UPDATE listing (เฉพาะเกษตรกร)
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
@@ -79,8 +82,10 @@ exports.update = async (req, res) => {
     }
 
     const payload = req.body;
-    if (payload.location_geom) {
-      payload.location_geom = { type: 'Point', coordinates: [payload.location_geom.lng, payload.location_geom.lat] };
+
+    if (payload.address) {
+      const coords = await geocodeAddress(payload.address);
+      if (coords) payload.location_geom = { type: 'Point', coordinates: [coords.lng, coords.lat] };
     }
 
     await listing.update(payload);
@@ -91,7 +96,7 @@ exports.update = async (req, res) => {
   }
 };
 
-// DELETE listing
+// DELETE listing (เฉพาะเกษตรกร)
 exports.remove = async (req, res) => {
   try {
     const { id } = req.params;

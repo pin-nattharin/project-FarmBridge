@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { Stack } from 'expo-router';
-import ListingCard from '../components/ui/ListingCard';
+import ListingCard from '../../components/ui/ListingCard';
 
 // --- Mock Data (ข้อมูลจำลอง) ---
 const mockListings = [

@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // 🟢 สำหรับพื้นหลังไล่ระดับ
+import { LinearGradient } from 'expo-linear-gradient'; // สำหรับพื้นหลังไล่ระดับ
+import { useRouter } from 'expo-router';
 
 // *** ตรวจสอบ Path การ Import ให้ถูกต้อง ***
-import RoundedInput from '../components/ui/RoundedInput'; 
-import Button from '../components/ui/Button'; 
+import RoundedInput from '../../components/ui/RoundedInput'; 
+import Button from '../../components/ui/Button'; 
 
 // สร้างตัวแปร styles ที่สามารถ export เพื่อให้ LoginScreen ใช้งานได้
 export const registerBaseStyles = StyleSheet.create({
@@ -83,8 +84,10 @@ export const registerBaseStyles = StyleSheet.create({
 });
 
 const RegisterBuyerScreen: React.FC = () => {
+  const router = useRouter();
+
   const handleRegister = () => {
-    console.log('Register pressed');
+    router.push('/LoginScreen');
   };
 
   return (

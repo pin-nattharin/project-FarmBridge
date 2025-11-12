@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-// ⬇️ 1. (แก้ไข) กลับไปใช้ 'DropDownPickerProps' ที่ถูกต้อง
 import DropDownPicker, { DropDownPickerProps } from 'react-native-dropdown-picker';
 
 // สีที่ใช้ (โดยประมาณจากรูป)
@@ -11,7 +10,6 @@ const COLORS = {
   text: '#074E9F',
 };
 
-// ⬇️ 2. (แก้ไข) เราจะใช้ 'DropDownPickerProps<string>'
 type CustomDropdownProps = DropDownPickerProps<string> & {
   containerStyle?: StyleProp<ViewStyle>;
 };
@@ -21,13 +19,10 @@ const CustomDropdown = (props: CustomDropdownProps) => {
     <View style={[styles.wrapper, props.containerStyle]}> 
       <DropDownPicker<string>
         {...props} 
-        // multiple={false} // ⬅️ 3. (แก้ไข) "ลบ" บรรทัดนี้!!
-        // (เราจะเชื่อ 'props' ที่ส่งมาจากข้างนอก)
         
         listMode="SCROLLVIEW"
         style={[styles.dropdownButton, props.style]}
         
-        // ⬇️ 4. (แก้ไข Typo) คุณตั้งชื่อ style ว่า 'textStyle'
         textStyle={styles.textStyle} 
         
         dropDownContainerStyle={styles.dropdownListContainer}

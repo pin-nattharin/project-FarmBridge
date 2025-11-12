@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 // *** ตรวจสอบ Path การ Import ให้ถูกต้อง ***
 import Button from '../components/ui/Button';
 import RoundedInput from '../components/ui/RoundedInput';
-import { registerBaseStyles } from './RegisterSellerScreen'; // Import Styles จาก RegisterScreen
+import { registerBaseStyles } from './registerSellerScreen'; // Import Styles จาก RegisterScreen
 
 const LoginScreen: React.FC = () => {
   const router = useRouter(); // เรียกใช้ Router
@@ -17,7 +17,7 @@ const LoginScreen: React.FC = () => {
 
   const handleRegisterNavigation = () => {
     // นำทางไปยังไฟล์ app/Register.tsx
-    router.push('/RegisterSellerScreen');
+    router.push('/registerSellerScreen');
   //router.push('/RegisterBuyerScreen');
   };
 

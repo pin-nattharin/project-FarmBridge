@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 // *** ตรวจสอบ Path การ Import ให้ถูกต้องตามโครงสร้างโปรเจกต์ของคุณ ***
 import SearchBar from '../../components/ui/SearchBar'; 
 import MarketingBanner from '../../components/ui/MarketingBanner'; 
-import CustomDropdown from '../../components/ui/dropdown'; 
+import CustomDropdown from '../../components/ui/Dropdown'; 
 import ProductCard from '../../components/ui/ProductCard'; 
 import BuyerNavbar from '../../components/ui/BuyerNavbar'; // แก้ Import เป็น BuyerNavbar
 

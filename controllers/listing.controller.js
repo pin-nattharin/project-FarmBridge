@@ -5,7 +5,7 @@ const Farmers = db.Farmers;
 const { geocodeAddress } = require('../utils/geocode');
 const { Op } = require('sequelize');
 
-// GET all listings (with optional filters: product_name, nearby lat/lng & radius, status)
+// GET all listings (optional filters: product_name, status)
 exports.getAll = async (req, res) => {
   try {
     const { product_name, status } = req.query;
@@ -16,7 +16,7 @@ exports.getAll = async (req, res) => {
     const rows = await Listings.findAll({
       where,
       include: [{ model: Farmers, as: 'seller', attributes: ['id','fullname','email','phone','address'] }],
-      order: [['createdAt','DESC']]
+      order: [['created_at','DESC']]
     });
 
     res.json(rows);
@@ -26,6 +26,7 @@ exports.getAll = async (req, res) => {
   }
 };
 
+// GET listing by id
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,36 +44,40 @@ exports.getById = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const identity = req.identity;
-    if (!identity || identity.role !== 'farmer') return res.status(403).json({ message: 'Only farmers can create listings' });
+    if (!identity || identity.role !== 'farmer')
+      return res.status(403).json({ message: 'Only farmers can create listings' });
 
-    const payload = req.body;
+    const { product_name, grade, quantity_total, price_per_unit, pickup_date, description, image_urls } = req.body;
 
-    // ถ้ามี address ให้แปลงเป็นพิกัด
-    if (payload.address && !payload.location_geom) {
-      const coords = await geocodeAddress(payload.address);
-      if (coords) payload.location_geom = { type: 'Point', coordinates: [coords.lng, coords.lat] };
+    // ตรวจสอบ required fields
+    if (!product_name || !quantity_total || !price_per_unit || !pickup_date) {
+      return res.status(400).json({ message: 'กรุณากรอกชื่อสินค้า, จำนวน, ราคาต่อหน่วย, และวันที่สะดวกรับสินค้า' });
     }
 
-    // quantity_available default to quantity_total if not provided
-    if (!payload.quantity_available && payload.quantity_total) payload.quantity_available = payload.quantity_total;
+    // ตรวจสอบอย่างน้อย 1 รูป
+    if (!image_urls || !Array.isArray(image_urls) || image_urls.length === 0) {
+      return res.status(400).json({ message: 'กรุณาใส่รูปสินค้าขึ้นไปอย่างน้อย 1 รูป' });
+    }
+
+    let location_geom = null;
+    const farmer = await Farmers.findByPk(identity.id);
+    if (farmer && farmer.address) {
+      const coords = await geocodeAddress(farmer.address);
+      if (coords) location_geom = { type: 'Point', coordinates: [coords.lng, coords.lat] };
+    }
 
     const newListing = await Listings.create({
       seller_id: identity.id,
-      product_name: payload.product_name,
-      grade: payload.grade || null,
-      quantity_total: payload.quantity_total || null,
-      quantity_available: payload.quantity_available || payload.quantity_total || null,
-      unit: payload.unit || null,
-      price_per_unit: payload.price_per_unit || null,
-      market_price_low: payload.market_price_low || null,
-      market_price_high: payload.market_price_high || null,
-      description: payload.description || null,
-      image_url: payload.image_url || null,
-      pickup_date: payload.pickup_date || null,
-      pickup_time: payload.pickup_time || null,
-      status: payload.status || 'available',
-      location_geom: payload.location_geom || null,
-      address: payload.address || null
+      product_name,
+      grade: grade || null,
+      quantity_total,
+      quantity_available: quantity_total,
+      price_per_unit,
+      pickup_date,
+      description: description || null,
+      image_url: image_urls, // array ของรูป
+      status: 'available',
+      location_geom
     });
 
     res.status(201).json({ message: 'Listing created', listing: newListing });
@@ -82,35 +87,54 @@ exports.create = async (req, res) => {
   }
 };
 
+// UPDATE listing (เฉพาะเกษตรกรเจ้าของ listing)
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
     const identity = req.identity;
     const listing = await Listings.findByPk(id);
-    if (!listing) return res.status(404).json({ message: 'Listing not found' });
 
+    if (!listing) return res.status(404).json({ message: 'Listing not found' });
     if (identity.role !== 'farmer' || Number(listing.seller_id) !== Number(identity.id)) {
       return res.status(403).json({ message: 'Not authorized to update this listing' });
     }
 
-    const payload = req.body;
-    if (payload.address && !payload.location_geom) {
-      const coords = await geocodeAddress(payload.address);
-      if (coords) payload.location_geom = { type: 'Point', coordinates: [coords.lng, coords.lat] };
-    }
+    const { product_name, grade, quantity_total, price_per_unit, pickup_date, description, image_urls } = req.body;
 
-    // if quantity_total changed and no quantity_available, try keep difference
-    if (payload.quantity_total && !payload.quantity_available) {
-      const diff = payload.quantity_total - (listing.quantity_total || 0);
+    const payload = {};
+    if (product_name) payload.product_name = product_name;
+    if (grade) payload.grade = grade;
+    if (quantity_total !== undefined) {
+      const diff = quantity_total - listing.quantity_total;
+      payload.quantity_total = quantity_total;
       payload.quantity_available = (listing.quantity_available || 0) + diff;
       if (payload.quantity_available < 0) payload.quantity_available = 0;
+    }
+    if (price_per_unit) payload.price_per_unit = price_per_unit;
+    if (pickup_date) payload.pickup_date = pickup_date;
+    if (description) payload.description = description;
+
+    // ถ้าอัปเดตรูป ต้องมีอย่างน้อย 1 รูป
+    if (image_urls !== undefined) {
+      if (!Array.isArray(image_urls) || image_urls.length === 0) {
+        return res.status(400).json({ message: 'กรุณาใส่รูปสินค้าขึ้นไปอย่างน้อย 1 รูป' });
+      }
+      payload.image_url = image_urls;
+    }
+
+    // fallback location_geom
+    if (!listing.location_geom) {
+      const farmer = await Farmers.findByPk(identity.id);
+      if (farmer && farmer.address) {
+        const coords = await geocodeAddress(farmer.address);
+        if (coords) payload.location_geom = { type: 'Point', coordinates: [coords.lng, coords.lat] };
+      }
     }
 
     await listing.update(payload);
 
-    // if quantity_available goes to 0 => mark sold
     if (listing.quantity_available !== null && Number(listing.quantity_available) <= 0) {
-      await listing.update({ status: 'sold' });
+      await listing.update({ status: 'sold_out' });
     }
 
     res.json({ message: 'Listing updated', listing });
@@ -120,6 +144,7 @@ exports.update = async (req, res) => {
   }
 };
 
+// DELETE listing (เฉพาะเจ้าของ)
 exports.remove = async (req, res) => {
   try {
     const { id } = req.params;
@@ -139,11 +164,7 @@ exports.remove = async (req, res) => {
   }
 };
 
-/**
- * Market price suggestion:
- * /api/listings/market-suggestion?product_name=mango&days=5
- * -> returns average, min, max price_per_unit from listings created in last `days`
- */
+// Market price suggestion (ให้ผู้ขายเห็นราคากลางเป็น popup)
 exports.marketSuggestion = async (req, res) => {
   try {
     const { product_name, days = 7 } = req.query;
@@ -155,20 +176,27 @@ exports.marketSuggestion = async (req, res) => {
     const rows = await Listings.findAll({
       where: {
         product_name: { [Op.iLike]: `%${product_name}%` },
-        createdAt: { [Op.gte]: since },
+        created_at: { [Op.gte]: since },
         price_per_unit: { [Op.ne]: null }
       },
-      attributes: ['price_per_unit', 'createdAt']
+      attributes: ['price_per_unit', 'created_at']
     });
 
-    if (!rows || rows.length === 0) return res.json({ message: 'No recent trades found', count: 0, avg: null });
+    if (!rows || rows.length === 0) 
+      return res.json({ message: 'No recent trades found', count: 0, avg: null });
 
     const prices = rows.map(r => Number(r.price_per_unit));
     const avg = prices.reduce((a,b)=>a+b,0)/prices.length;
     const min = Math.min(...prices);
     const max = Math.max(...prices);
 
-    res.json({ count: prices.length, avg: Number(avg.toFixed(2)), low: min, high: max, sample_count: prices.length });
+    res.json({ 
+      count: prices.length, 
+      avg: Number(avg.toFixed(2)), 
+      low: min, 
+      high: max, 
+      sample_count: prices.length 
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Suggestion failed', error: err.message });

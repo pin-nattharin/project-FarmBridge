@@ -18,7 +18,6 @@ module.exports = (sequelize) => {
     phone: DataTypes.STRING(20),
     address: DataTypes.TEXT,
     location_geom: DataTypes.GEOMETRY('POINT', 4326),
-    // profile_image_base64: DataTypes.TEXT,
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true

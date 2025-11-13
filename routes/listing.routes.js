@@ -5,12 +5,12 @@ const listingController = require('../controllers/listing.controller');
 const { authenticateToken } = require('../middleware/auth.middleware');
 const { checkRole } = require('../middleware/role.middleware');
 
+// market suggestion (public)
+router.get('/market-suggestion', listingController.marketSuggestion);
+
 // public
 router.get('/', listingController.getAll);
 router.get('/:id', listingController.getById);
-
-// market suggestion (public)
-router.get('/market-suggestion', listingController.marketSuggestion);
 
 // protected (farmer only)
 router.post('/', authenticateToken, checkRole('farmer'), listingController.create);

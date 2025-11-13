@@ -19,7 +19,6 @@ module.exports = (sequelize) => {
     address: DataTypes.TEXT,
     location_geom: DataTypes.GEOMETRY('POINT', 4326), // ใช้แทน GEOGRAPHY(Point,4326)
     farmer_doc_url: DataTypes.TEXT,
-    // profile_image_base64: DataTypes.TEXT,
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
